@@ -1,0 +1,60 @@
+name: BuildBuddy
+main: me.chasertw123.dolphin.Main
+version: 1.0.0
+api-version: 1.17
+author: chasertw123
+
+commands:
+  light:
+    description: Gives light block
+    permission: buildbuddy.light
+  buildmode:
+    description: Disable/Enable block updates when to place or break a block
+    permission: buildbuddy.buildmode
+    aliases: bm
+  waterlog:
+    description: Water log all blocks in a radius equal to and below your position
+    permission: buildbuddy.waterlog
+  unwaterlog:
+    description: Unwater log all blocks in a radius equal to and below your position
+    permission: buildbuddy.unwaterlog
+  blockbiome:
+    description: Change the biome of specific blocks in a radius
+    permission: buildbuddy.blockbiome
+    aliases: bb
+  blocknames:
+    description: Get the names of all the blocks you have clicked
+    permission: buildbuddy.blocknames
+    aliases: bn
+
+permissions:
+  buildbuddy.light:
+    description: Allows light command
+    default: op
+  buildbuddy.buildmode:
+    description: Allows buildmode command
+    default: op
+  buildbuddy.waterlog:
+    description: Allows waterlog command
+    default: op
+  buildbuddy.unwaterlog:
+    description: Allows unwaterlog command
+    default: op
+  buildbuddy.blockbiome:
+    description: Allows blockbiome command
+    default: op
+  buildbuddy.blocknames:
+    description: Allows blocknames command
+    default: op
+  buildbuddy.*:
+    description: Wildcard Permission
+    default: op
+    children:
+      buildbuddy.light: true
+      buildbuddy.buildmode: true
+      buildbuddy.waterlog: true
+      buildbuddy.unwaterlog: true
+      buildbuddy.blockbiome: true
+      buildbuddy.blocknames: true
+      buildbuddy.irondoors: true
+      buildbuddy.ageable: true
