@@ -1,6 +1,6 @@
 name: BuildBuddy
-main: me.chasertw123.dolphin.Main
-version: 1.0.0
+main: com.chasemc.buildbuddy.Main
+version: 1.0.1
 api-version: 1.17
 author: chasertw123
 

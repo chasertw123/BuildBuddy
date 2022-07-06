@@ -18,6 +18,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
@@ -78,8 +79,12 @@ public class BlockUpdatesListeners implements Listener {
                 rel.setBlockData(directional, false);
             }
             case COCOA -> {
+                BlockFace direction = event.getBlockFace().getOppositeFace();
+                if (event.getBlockFace() == BlockFace.UP || event.getBlockFace() == BlockFace.DOWN)
+                    direction = this.lookDirectionToBlockFace(event.getPlayer().getLocation().getDirection());
+
                 Directional directional = (Directional) rel.getBlockData();
-                directional.setFacing(event.getBlockFace().getOppositeFace());
+                directional.setFacing(direction);
                 rel.setBlockData(directional, false);
             }
 
@@ -104,5 +109,16 @@ public class BlockUpdatesListeners implements Listener {
         event.getPlayer().swingMainHand();
 
         event.setCancelled(true);
+    }
+
+    private BlockFace lookDirectionToBlockFace(Vector v) {
+        double x = Math.abs(v.getX());
+        double y = Math.abs(v.getY());
+        double z = Math.abs(v.getZ());
+
+        if (x > z)
+            return v.getX() > 0 ? BlockFace.EAST : BlockFace.WEST;
+
+        return v.getZ() > 0 ? BlockFace.SOUTH : BlockFace.NORTH;
     }
 }
