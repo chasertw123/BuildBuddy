@@ -65,6 +65,11 @@ public class BuildModeCommand extends PlayerCommand {
                     return;
                 }
 
+                if (!BuildModeManager.materialToBlockMaterial(material).isBlock()) {
+                    player.sendMessage(ChatColor.YELLOW + material.name().toLowerCase().replace('_', ' ') + ChatColor.RED + " is not a placeable block!");
+                    return;
+                }
+
                 BuildModeManager.addMaterial(material);
                 player.sendMessage(ChatColor.GREEN + "Added " + ChatColor.YELLOW + material.name().toLowerCase().replace('_', ' ') + ChatColor.GREEN + " to the special block handler!");
                 return;

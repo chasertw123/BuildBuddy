@@ -88,4 +88,20 @@ public class BuildModeManager {
         Main.getInstance().getConfig().set("buildmode-blocks", materials.stream().map(Enum::name).toList());
         Main.getInstance().saveConfig();
     }
+
+    public static Material materialToBlockMaterial(Material material) {
+        return switch (material) {
+            case COCOA_BEANS -> Material.COCOA;
+            case WHEAT_SEEDS -> Material.WHEAT;
+            case BEETROOT_SEEDS -> Material.BEETROOTS;
+            case CARROT -> Material.CARROTS;
+            case POTATO -> Material.POTATOES;
+            case PUMPKIN_SEEDS -> Material.PUMPKIN_STEM;
+            case MELON_SEEDS, MELON_SLICE -> Material.MELON_STEM;
+            case WATER_BUCKET -> Material.WATER;
+            case LAVA_BUCKET -> Material.LAVA;
+            case POWDER_SNOW_BUCKET -> Material.POWDER_SNOW;
+            default -> material;
+        };
+    }
 }

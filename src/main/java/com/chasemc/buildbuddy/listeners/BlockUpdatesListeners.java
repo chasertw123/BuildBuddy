@@ -55,19 +55,9 @@ public class BlockUpdatesListeners implements Listener {
                 || !BuildModeManager.containsMaterial(event.getMaterial()))
             return;
 
-        Material blockMaterial = switch (event.getMaterial()) {
-            case COCOA_BEANS -> Material.COCOA;
-            case WHEAT_SEEDS -> Material.WHEAT;
-            case BEETROOT_SEEDS -> Material.BEETROOTS;
-            case CARROT -> Material.CARROTS;
-            case POTATO -> Material.POTATOES;
-            case PUMPKIN_SEEDS -> Material.PUMPKIN_STEM;
-            case MELON_SEEDS, MELON_SLICE -> Material.MELON_STEM;
-            default -> event.getMaterial();
-        };
-
+        Material blockMaterial = BuildModeManager.materialToBlockMaterial(event.getMaterial());
         Block rel = Objects.requireNonNull(event.getClickedBlock()).getRelative(event.getBlockFace());
-        if (rel.getType() != Material.AIR)
+        if (rel.getType() != Material.AIR || !blockMaterial.isBlock())
             return;
 
         rel.setType(blockMaterial, false);
