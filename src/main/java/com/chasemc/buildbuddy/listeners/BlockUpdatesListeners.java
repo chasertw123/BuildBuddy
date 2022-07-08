@@ -68,10 +68,21 @@ public class BlockUpdatesListeners implements Listener {
                 directional.setFacing(event.getBlockFace());
                 rel.setBlockData(directional, false);
             }
+
             case COCOA -> {
                 BlockFace direction = event.getBlockFace().getOppositeFace();
                 if (event.getBlockFace() == BlockFace.UP || event.getBlockFace() == BlockFace.DOWN)
                     direction = this.lookDirectionToBlockFace(event.getPlayer().getLocation().getDirection());
+
+                Directional directional = (Directional) rel.getBlockData();
+                directional.setFacing(direction);
+                rel.setBlockData(directional, false);
+            }
+
+            case TRIPWIRE_HOOK -> {
+                BlockFace direction = event.getBlockFace();
+                if (event.getBlockFace() == BlockFace.UP || event.getBlockFace() == BlockFace.DOWN)
+                    direction = this.lookDirectionToBlockFace(event.getPlayer().getLocation().getDirection()).getOppositeFace();
 
                 Directional directional = (Directional) rel.getBlockData();
                 directional.setFacing(direction);
