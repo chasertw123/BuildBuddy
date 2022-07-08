@@ -98,6 +98,7 @@ public class BuildModeManager {
             case POTATO -> Material.POTATOES;
             case PUMPKIN_SEEDS -> Material.PUMPKIN_STEM;
             case MELON_SEEDS, MELON_SLICE -> Material.MELON_STEM;
+            case SWEET_BERRIES -> Material.SWEET_BERRY_BUSH;
             case WATER_BUCKET -> Material.WATER;
             case LAVA_BUCKET -> Material.LAVA;
             case POWDER_SNOW_BUCKET -> Material.POWDER_SNOW;

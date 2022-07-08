@@ -14,14 +14,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerHarvestBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.List;
+
 public class BlockInteractListener implements Listener {
+
+    private static final List<Material> BLACKLIST = List.of(
+            Material.TWISTING_VINES,
+            Material.WEEPING_VINES,
+            Material.SUGAR_CANE,
+            Material.KELP,
+            Material.CACTUS
+    );
 
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onRightClickBlock(PlayerInteractEvent event) {
-
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK
                 || event.getHand() == EquipmentSlot.OFF_HAND
                 || event.getClickedBlock() == null)
@@ -41,15 +51,17 @@ public class BlockInteractListener implements Listener {
         if (!(BuildModeManager.isActive(player) && !player.isSneaking()))
             return;
 
-        if (block.getBlockData() instanceof Ageable ageable) {
+        if (block.getBlockData() instanceof Ageable ageable && !BLACKLIST.contains(block.getType())) {
             if (block.getType() == Material.MANGROVE_PROPAGULE && !((Hangable) block.getBlockData()).isHanging())
                 return;
 
-            int newAge = ageable.getAge() + 1;
-            if (newAge > ageable.getMaximumAge())
-                newAge = 0;
+            int newAge = switch (block.getType()) {
+                case CHORUS_FLOWER -> ageable.getAge() == 5 ? 0 : 5; // Skip stages without change
+                case NETHER_WART -> ageable.getAge() == 1 ? 3 : ageable.getAge() + 1; // Skip growth stage without visuals
+                default -> ageable.getAge() + 1; // Increase age by one stage
+            };
 
-            ageable.setAge(newAge);
+            ageable.setAge(newAge > ageable.getMaximumAge() ? 0 : newAge);
             block.setBlockData(ageable, false);
             player.playSound(event.getPlayer().getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
             event.setCancelled(true);
@@ -65,5 +77,11 @@ public class BlockInteractListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler (priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerHarvestBlock(PlayerHarvestBlockEvent event) {
+        if (BuildModeManager.isActive(event.getPlayer()))
+            event.setCancelled(true);
     }
 }
