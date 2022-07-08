@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class BlockInteractListener implements Listener {
 
     private static final List<Material> BLACKLIST = List.of(

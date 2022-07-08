@@ -1,10 +1,9 @@
 package com.chasemc.buildbuddy.listeners;
 
-import com.chasemc.buildbuddy.Main;
 import com.chasemc.buildbuddy.BuildModeManager;
+import com.chasemc.buildbuddy.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
