@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Hangable;
@@ -86,16 +87,35 @@ public class BlockUpdatesListeners implements Listener {
                 hangable.setHanging(true);
                 rel.setBlockData(hangable, false);
             }
+
+            case LILAC, ROSE_BUSH, SUNFLOWER, PEONY, TALL_GRASS, LARGE_FERN -> {
+                Bisected bisected = (Bisected) rel.getBlockData();
+                bisected.setHalf(Bisected.Half.TOP);
+                rel.setBlockData(bisected, false);
+
+                Block otherHalf = rel.getRelative(BlockFace.DOWN);
+                if (otherHalf.getType() != rel.getType())
+                    break;
+
+                bisected = (Bisected) otherHalf.getBlockData();
+                bisected.setHalf(Bisected.Half.BOTTOM);
+                otherHalf.setBlockData(bisected, false);
+            }
+
+            case WEEPING_VINES -> {
+                Block block = rel.getRelative(BlockFace.UP);
+                if (block.getType() == rel.getType())
+                    block.setType(Material.WEEPING_VINES_PLANT, false);
+            }
+
+            case TWISTING_VINES -> {
+                Block block = rel.getRelative(BlockFace.DOWN);
+                if (block.getType() == rel.getType())
+                    block.setType(Material.TWISTING_VINES_PLANT, false);
+            }
         }
 
-        Sound sound;
-        try {
-            sound = Sound.valueOf(String.format("BLOCK_%s_PLACE", event.getMaterial().name()));
-        } catch (IllegalArgumentException e) {
-            sound = Sound.BLOCK_GRASS_PLACE;
-        }
-
-        event.getPlayer().playSound(rel.getLocation(), sound, 1f, 1f);
+        rel.getWorld().playSound(rel.getLocation(), rel.getBlockData().getSoundGroup().getPlaceSound(), 1f, 1f);
         event.getPlayer().swingMainHand();
 
         event.setCancelled(true);
