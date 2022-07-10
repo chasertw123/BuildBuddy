@@ -6,16 +6,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.Hangable;
+import org.bukkit.block.data.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
@@ -35,7 +34,12 @@ public class BlockUpdatesListeners implements Listener {
             return;
 
         BlockData data = event.getBlock().getBlockData().clone();
-        Bukkit.getScheduler().runTask(Main.getInstance(), () -> event.getBlock().setBlockData(data, false));
+        Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+            if (data.getMaterial() == Material.POWDER_SNOW && event.getBlock().getType() != Material.AIR)
+                return;
+
+            event.getBlock().setBlockData(data, false);
+        });
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -48,10 +52,55 @@ public class BlockUpdatesListeners implements Listener {
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerPlaceBlockWithBucket(PlayerBucketEmptyEvent event) {
+        if (!BuildModeManager.isActive(event.getPlayer()))
+            return;
+
+        event.setCancelled(true);
+        switch (event.getBucket()) {
+            case LAVA_BUCKET -> {
+                if (event.getBlock().getType() == Material.AIR)
+                    event.getBlock().setType(Material.LAVA, false);
+            }
+            // NOTE: This event is not called when placing a powdered snow bucket
+            case WATER_BUCKET -> {
+                if (event.getBlockClicked().getBlockData() instanceof Waterlogged waterlogged && !waterlogged.isWaterlogged()) {
+                    waterlogged.setWaterlogged(true);
+                    event.getBlockClicked().setBlockData(waterlogged, false);
+                }
+
+                else if (event.getBlock().getType() == Material.AIR) {
+                    event.getBlock().setType(Material.WATER, false);
+                }
+            }
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerEmptyBlockWithBucket(PlayerBucketFillEvent event) {
+        if (!BuildModeManager.isActive(event.getPlayer()))
+            return;
+
+        event.setCancelled(true);
+        switch (event.getBlock().getType()) {
+            case WATER, LAVA, POWDER_SNOW -> {
+                event.getBlock().setType(Material.AIR, false);
+                return;
+            }
+        }
+
+        if (event.getBlock().getBlockData() instanceof Waterlogged waterlogged) {
+            waterlogged.setWaterlogged(false);
+            event.getBlock().setBlockData(waterlogged, false);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!BuildModeManager.isActive(event.getPlayer())
                 || event.getHand() == EquipmentSlot.OFF_HAND
                 || event.getAction() != Action.RIGHT_CLICK_BLOCK
+                || event.getClickedBlock() == null
                 || !BuildModeManager.containsMaterial(event.getMaterial()))
             return;
 
