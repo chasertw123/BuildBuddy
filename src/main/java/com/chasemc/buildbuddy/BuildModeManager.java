@@ -99,6 +99,7 @@ public class BuildModeManager {
             case PUMPKIN_SEEDS -> Material.PUMPKIN_STEM;
             case MELON_SEEDS, MELON_SLICE -> Material.MELON_STEM;
             case SWEET_BERRIES -> Material.SWEET_BERRY_BUSH;
+            case BAMBOO -> Material.BAMBOO_SAPLING;
             default -> material;
         };
     }

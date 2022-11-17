@@ -2,6 +2,7 @@ package com.chasemc.buildbuddy.listeners;
 
 import com.chasemc.buildbuddy.BlockNameCopierManager;
 import com.chasemc.buildbuddy.BuildModeManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -9,9 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.Hangable;
-import org.bukkit.block.data.type.Door;
-import org.bukkit.block.data.type.Gate;
-import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.block.data.type.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -48,7 +47,7 @@ public class BlockInteractListener implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onClickAgeableBlock(PlayerInteractEvent event) {
         if (this.isInvalidInteraction(event) || !BuildModeManager.isActive(event.getPlayer())
                 || (event.getPlayer().isSneaking() && event.getItem() != null))
@@ -58,7 +57,7 @@ public class BlockInteractListener implements Listener {
         event.setCancelled(this.handleClickingAgeableBlock(event.getClickedBlock()));
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onClickOpenableBlock(PlayerInteractEvent event) {
         if (this.isInvalidInteraction(event) || !BuildModeManager.isActive(event.getPlayer())
                 || (event.getPlayer().isSneaking() && event.getItem() != null))
@@ -67,6 +66,21 @@ public class BlockInteractListener implements Listener {
         assert event.getClickedBlock() != null;
         event.setCancelled(this.handleClickingOpenableBlock(event.getClickedBlock()));
     }
+
+    // TODO: Custom Hit Box for Fences
+//    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+//    public void onClickFenceBlock(PlayerInteractEvent event) {
+//        if (this.isInvalidInteraction(event) || !BuildModeManager.isActive(event.getPlayer())
+//                || (event.getPlayer().isSneaking() && event.getItem() != null))
+//            return;
+//
+//        assert event.getClickedBlock() != null;
+//        if (event.getClickedBlock().getBlockData() instanceof Fence fence && fence.getAllowedFaces().contains(event.getBlockFace())) {
+//            fence.setFace(event.getBlockFace(), !fence.hasFace(event.getBlockFace()));
+//            event.getClickedBlock().setBlockData(fence, false);
+//            event.setCancelled(true);
+//        }
+//    }
 
     @EventHandler (priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerHarvestBlock(PlayerHarvestBlockEvent event) {
@@ -81,6 +95,13 @@ public class BlockInteractListener implements Listener {
     }
 
     private boolean handleClickingAgeableBlock(Block block) {
+        // Handle Bamboo Sapling
+        if (block.getType() == Material.BAMBOO_SAPLING) {
+            block.setType(Material.BAMBOO, false);
+            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
+            return true;
+        }
+        
         if (block.getBlockData() instanceof Ageable ageable && !BLACKLIST.contains(block.getType())) {
             if (block.getType() == Material.MANGROVE_PROPAGULE && !((Hangable) block.getBlockData()).isHanging())
                 return false;
@@ -91,9 +112,33 @@ public class BlockInteractListener implements Listener {
                 default -> ageable.getAge() + 1; // Increase age by one stage
             };
 
+            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
+
+            // Special Handler for Bamboo
+            if (block.getBlockData() instanceof Bamboo bamboo) {
+                // Return bamboo to sapling
+                if (newAge > ageable.getMaximumAge() && bamboo.getLeaves() == Bamboo.Leaves.LARGE) {
+                    block.setType(Material.BAMBOO_SAPLING, false);
+                    return true;
+                }
+
+                // Cycle through Different leaves before cycling age
+                Bamboo.Leaves leaves = switch (bamboo.getLeaves()) {
+                    case NONE -> Bamboo.Leaves.SMALL;
+                    case SMALL -> Bamboo.Leaves.LARGE;
+                    case LARGE -> Bamboo.Leaves.NONE;
+                };
+
+                bamboo.setLeaves(leaves);
+                if (leaves == Bamboo.Leaves.NONE)
+                    bamboo.setAge(newAge);
+
+                block.setBlockData(bamboo, false);
+                return true;
+            }
+
             ageable.setAge(newAge > ageable.getMaximumAge() ? 0 : newAge);
             block.setBlockData(ageable, false);
-            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
             return true;
         }
 

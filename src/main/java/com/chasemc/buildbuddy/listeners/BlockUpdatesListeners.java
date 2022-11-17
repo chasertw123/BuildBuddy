@@ -95,7 +95,7 @@ public class BlockUpdatesListeners implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!BuildModeManager.isActive(event.getPlayer())
                 || event.getHand() == EquipmentSlot.OFF_HAND
