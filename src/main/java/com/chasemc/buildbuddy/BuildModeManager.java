@@ -100,6 +100,7 @@ public class BuildModeManager {
             case MELON_SEEDS, MELON_SLICE -> Material.MELON_STEM;
             case SWEET_BERRIES -> Material.SWEET_BERRY_BUSH;
             case BAMBOO -> Material.BAMBOO_SAPLING;
+            case GLOW_BERRIES -> Material.CAVE_VINES;
             default -> material;
         };
     }

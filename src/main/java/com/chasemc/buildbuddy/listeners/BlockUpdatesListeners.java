@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.*;
+import org.bukkit.block.data.type.CaveVinesPlant;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -171,6 +172,18 @@ public class BlockUpdatesListeners implements Listener {
                 Block block = rel.getRelative(BlockFace.DOWN);
                 if (block.getType() == rel.getType())
                     block.setType(Material.TWISTING_VINES_PLANT, false);
+            }
+
+            case CAVE_VINES -> {
+                Block block = rel.getRelative(BlockFace.UP);
+                if (block.getType() == rel.getType()) {
+                    boolean hasBerries = ((CaveVinesPlant) block.getBlockData()).isBerries();
+                    block.setType(Material.CAVE_VINES_PLANT, false);
+
+                    CaveVinesPlant caveVinesPlant = (CaveVinesPlant) block.getBlockData();
+                    caveVinesPlant.setBerries(hasBerries);
+                    block.setBlockData(caveVinesPlant, false);
+                }
             }
         }
 

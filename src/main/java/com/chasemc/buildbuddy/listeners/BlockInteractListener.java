@@ -101,6 +101,13 @@ public class BlockInteractListener implements Listener {
             block.getWorld().playSound(block.getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
             return true;
         }
+
+        else if (block.getBlockData() instanceof CaveVinesPlant vines) {
+            vines.setBerries(!vines.isBerries());
+            block.setBlockData(vines, false);
+            block.getWorld().playSound(block.getLocation(), Sound.ITEM_BONE_MEAL_USE, 1F, 1F);
+            return true;
+        }
         
         if (block.getBlockData() instanceof Ageable ageable && !BLACKLIST.contains(block.getType())) {
             if (block.getType() == Material.MANGROVE_PROPAGULE && !((Hangable) block.getBlockData()).isHanging())
