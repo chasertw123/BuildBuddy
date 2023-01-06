@@ -37,17 +37,21 @@ public class LightCommand extends PlayerCommand {
             }
         }
 
-        ItemStack item = new ItemStack(Material.LIGHT);
-        BlockDataMeta meta = (BlockDataMeta) item.getItemMeta();
+        try {
+            ItemStack item = new ItemStack(Material.LIGHT);
+            BlockDataMeta meta = (BlockDataMeta) item.getItemMeta();
 
-        assert meta != null;
-        Light state = (Light) meta.getBlockData(Material.LIGHT);
-        state.setLevel(level);
-        meta.setBlockData(state);
-        item.setItemMeta(meta);
+            assert meta != null;
+            Light state = (Light) meta.getBlockData(Material.LIGHT);
+            state.setLevel(level);
+            meta.setBlockData(state);
+            item.setItemMeta(meta);
 
-        player.getInventory().addItem(item);
-        player.sendMessage(ChatColor.GREEN + "Added a level " + ChatColor.YELLOW + level + ChatColor.GREEN + " light block to your inventory!");
+            player.getInventory().addItem(item);
+            player.sendMessage(ChatColor.GREEN + "Added a level " + ChatColor.YELLOW + level + ChatColor.GREEN + " light block to your inventory!");
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "Unable to use command in this version! Please update to a newer version of Spigot/Paper!");
+        }
     }
 
     @Override
